@@ -1,0 +1,28 @@
+body, html {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+}
+#map {
+  height: 100vh;
+}
+.legend {
+  position: absolute;
+  bottom: 30px;
+  right: 10px;
+  background: white;
+  padding: 10px;
+  font-family: Arial, sans-serif;
+  font-size: 14px;
+  border-radius: 6px;
+  box-shadow: 0 0 15px rgba(0,0,0,0.2);
+  line-height: 18px;
+  color: #333;
+}
+.legend-color {
+  display: inline-block;
+  width: 20px;
+  height: 12px;
+  margin-right: 5px;
+  vertical-align: middle;
+}

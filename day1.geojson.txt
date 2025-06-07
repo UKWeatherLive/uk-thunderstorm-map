@@ -1,0 +1,34 @@
+const fs = require('fs');
+const fetch = require('node-fetch');
+
+const LAT_MIN = 49.9, LAT_MAX = 60.9, LON_MIN = -8.7, LON_MAX = 1.8;
+const STEP = 0.5; // 0.5° ~50km resolution
+
+(async () => {
+  const features = [];
+  for (let lat=LAT_MIN; lat<=LAT_MAX; lat+=STEP) {
+    for (let lon=LON_MIN; lon<=LON_MAX; lon+=STEP) {
+      const url = `https://api.open-meteo.com/v1/ukmo?latitude=${lat}&longitude=${lon}&hourly=weathercode&forecast_days=1&timezone=UTC`;
+      const res = await fetch(url);
+      const json = await res.json();
+      // Check for thunderstorm code (codes 2,3,4):
+      if (json.hourly.weathercode.some(code => [2,3,4].includes(code))) {
+        const coords = [
+          [lon, lat],
+          [lon+STEP, lat],
+          [lon+STEP, lat+STEP],
+          [lon, lat+STEP],
+          [lon, lat]
+        ];
+        features.push({
+          type: 'Feature',
+          properties: { DN: 'TSTM', LABEL2: 'Thunderstorm Risk' },
+          geometry: { type: 'Polygon', coordinates: [coords] }
+        });
+      }
+    }
+  }
+  const geo = { type: 'FeatureCollection', features };
+  fs.writeFileSync('day1.geojson', JSON.stringify(geo, null, 2));
+  console.log('Also created day1.geojson with', features.length, 'cells');
+})();
